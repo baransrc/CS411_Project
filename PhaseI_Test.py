@@ -132,9 +132,9 @@ ReturnCode = CheckSignature(q, p, g, alpha, beta)
 if ReturnCode == 0: print("Signature generation: Passed!")
 else: print("Signature generation: Failed!"); sys.exit()
 
-# # Test 4: Verifying the signatures in "TestSet.txt"
-# if (CheckTestSignatures() == 0): print("Sample signatures test: Passed!")
-# else: print("Sample signatures test: Failed!"); sys.exit()
+# Test 4: Verifying the signatures in "TestSet.txt"
+if (CheckTestSignatures() == 0): print("Sample signatures test: Passed!")
+else: print("Sample signatures test: Failed!"); sys.exit()
 
 # # Test 5: generating a single random transaction, sign and verify it
 # if (CheckTransaction(q, p, g) == 0): print("Transaction signature verifies: Passed!")
