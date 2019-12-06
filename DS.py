@@ -101,37 +101,20 @@ def modinv(a, m):
     else:
         return x % m
 
-def SignGen(message, q, p, g, alpha):  # generating signature
-    k = random.randint(0, q-2)  # select random number for k
-    r = pow(g, k, p)  # calculate r
-    sha_obj1 = SHA3_256.new()  # create a SHA3_256 object
-    data1 = (str(message) + str(r)).encode('utf-8')  # concatenate the string with r and encode the new string into byte format
-    h = sha_obj1.update(data1)  # hash the encoded string
-    h_hex = h.hexdigest()  # make the hash turn into hex format
-    h_int = int(h_hex, 16)  # convert hex to decimal
-    del sha_obj1
-    s = ((alpha * h_int) + k) % q  # calculate the s value
-    return s,h_int
+def SignGen(message, q, p, g, alpha):
+    h = SHA3_256(message) % q
+    k = random.randint(1, q-2)
+    r = pow(g, k, p) % q
+    s = a * r - k * h
+    return s, r
 
-def SignVer(message, s, h, q, p, g, beta):  # verification of the signature
-    new_h = -h
-    while new_h < 0:
-        new_h += p-1
-    first = pow(g, s, p)
-    second = pow(beta, new_h, p)
-    v = (first * second)% p  # calculate v
-    sha_obj2 = SHA3_256.new()  # create a SHA3_256 object
-    data2 = (str(message) + str(v)).encode('utf-8')  # concatenate the string with v and encode the new string into byte format
-    h_tilde = sha_obj2.update(data2)  # hash the encoded string
-    h_tilde_hex = h_tilde.hexdigest()  # make the hash turn into hex format
-    h_tilde_int = int(h_tilde_hex, 16)  # convert hex to decimal
-    del sha_obj2
-    print(h%q)
-    print(h_tilde_int%q)
-    print(q)
-    if (h%q) == (h_tilde_int % q):  # if h_tilde is equal to h in modulo q, then verification is successful
-        return 0
-        # print("ACCEPT")
-    else:  # for all the other cases, verification is not successful
-        return 1
-        # print("REJECT")
+def SignVer(message, s, r, q, p, g, beta):
+    h = SHA3_256(message) % q
+    v = modinv(h, q)
+    z1 = s * v % q
+    z2 = r * v % q
+    u = (pow(modinv(g, p), z1, p) * pow(b, z2, p) % p) % q
+    if u == r:
+        print("Signature is accepted.")
+    else:
+        print("Signature is rejected.")
