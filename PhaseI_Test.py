@@ -127,25 +127,25 @@ ReturnCode = CheckKeys(q, p, g, alpha, beta)
 if ReturnCode == 0: print("Public/private key pair: Passed!")
 else: print("Public/private key pair: Failed!"); sys.exit()
 
-# # Test 3: Check the signature generation-verification for a randomly generated message
-# ReturnCode = CheckSignature(q, p, g, alpha, beta)
-# if ReturnCode == 0: print("Signature generation: Passed!")
-# else: print("Signature generation: Failed!"); sys.exit()
+# Test 3: Check the signature generation-verification for a randomly generated message
+ReturnCode = CheckSignature(q, p, g, alpha, beta)
+if ReturnCode == 0: print("Signature generation: Passed!")
+else: print("Signature generation: Failed!"); sys.exit()
 
-# # Test 4: Verifying the signatures in "TestSet.txt"
-# if (CheckTestSignatures() == 0): print("Sample signatures test: Passed!")
-# else: print("Sample signatures test: Failed!"); sys.exit()
+# Test 4: Verifying the signatures in "TestSet.txt"
+if (CheckTestSignatures() == 0): print("Sample signatures test: Passed!")
+else: print("Sample signatures test: Failed!"); sys.exit()
 
-# # Test 5: generating a single random transaction, sign and verify it
-# if (CheckTransaction(q, p, g) == 0): print("Transaction signature verifies: Passed!")
-# else: print("Transaction signature DOES NOT verify: Failed!"); sys.exit()
+# Test 5: generating a single random transaction, sign and verify it
+if (CheckTransaction(q, p, g) == 0): print("Transaction signature verifies: Passed!")
+else: print("Transaction signature DOES NOT verify: Failed!"); sys.exit()
 
 
-# # Test 6: Verifying the signatures of transactions in "transactions.txt"
-# result = CheckBlockofTransactions()
-# if -1 not in result: print("All transactions verified successfully: Passed!")
-# else:
-#     for i in range(len(result)):
-#         if result[i] == -1:
-#             print("Failure: tsransaction", i+1, "does not verify: Failed!")
-#     sys.exit()
+# Test 6: Verifying the signatures of transactions in "transactions.txt"
+result = CheckBlockofTransactions()
+if -1 not in result: print("All transactions verified successfully: Passed!")
+else:
+    for i in range(len(result)):
+        if result[i] == -1:
+            print("Failure: tsransaction", i+1, "does not verify: Failed!")
+    sys.exit()

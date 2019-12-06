@@ -6,7 +6,9 @@ import sys
 import time
 import random
 import string
+import pyprimes
 from Crypto.Util import number
+from Crypto.Hash import SHA3_256
 
 def Setup(candidate_p_count = 1, verbose = False):
     bitSizeP = 2048
@@ -80,3 +82,39 @@ def GenerateOrRead(fileName, verbose = False):
 def random_string(length):
    letters = string.ascii_lowercase
    return ''.join(random.choice(letters) for i in range(length))
+
+def egcd(a, b):
+    x,y, u,v = 0,1, 1,0
+    while a != 0:
+        q, r = b//a, b%a
+        m, n = x-u*q, y-v*q
+        b,a, x,y, u,v = a,r, u,v, m,n
+    gcd = b
+    return gcd, x, y
+
+def modinv(a, m):
+    if a < 0:
+        a = a+m
+    gcd, x, y = egcd(a, m)
+    if gcd != 1:
+        return None  # modular inverse does not exist
+    else:
+        return x % m
+
+def SignGen(message, q, p, g, alpha):
+    h = SHA3_256(message) % q
+    k = random.randint(1, q-2)
+    r = pow(g, k, p) % q
+    s = a * r - k * h
+    return s, r
+
+def SignVer(message, s, r, q, p, g, beta):
+    h = SHA3_256(message) % q
+    v = modinv(h, q)
+    z1 = s * v % q
+    z2 = r * v % q
+    u = (pow(modinv(g, p), z1, p) * pow(b, z2, p) % p) % q
+    if u == r:
+        print("Signature is accepted.")
+    else:
+        print("Signature is rejected.")
