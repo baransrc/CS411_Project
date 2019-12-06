@@ -105,7 +105,7 @@ def SignGen(message, q, p, g, alpha):
     h = SHA3_256(message) % q
     k = random.randint(1, q-2)
     r = pow(g, k, p) % q
-    s = a * r - k * h
+    s = alpha * r - k * h
     return s, r
 
 def SignVer(message, s, r, q, p, g, beta):
@@ -113,7 +113,7 @@ def SignVer(message, s, r, q, p, g, beta):
     v = modinv(h, q)
     z1 = s * v % q
     z2 = r * v % q
-    u = (pow(modinv(g, p), z1, p) * pow(b, z2, p) % p) % q
+    u = (pow(modinv(g, p), z1, p) * pow(beta, z2, p) % p) % q
     if u == r:
         print("Signature is accepted.")
     else:
