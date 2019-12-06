@@ -101,31 +101,34 @@ def modinv(a, m):
     else:
         return x % m
 
-def SignGen(message, q, p, g, alpha):  # generating signature
-    k = random.randint(0, q-2)  # select random number for k
-    r = pow(g, k, p)  # calculate r
-    sha_obj1 = SHA3_256.new()  # create a SHA3_256 object
-    data1 = (str(message) + str(r)).encode('utf-8')  # concatenate the string with r and encode the new string into byte format
-    h = sha_obj1.update(data1)  # hash the encoded string
-    h_hex = h.hexdigest()  # make the hash turn into hex format
-    h_int = int(h_hex, 16)  # convert hex to decimal
-    del sha_obj1
-    s = ((alpha * h_int) + k) % q  # calculate the s value
-    return s,h_int
+def SignGen(message, q, p, g, alpha):
+    k = random.randint(0, q-2)
+    r = pow(g, k, p)  
 
-def SignVer(message, s, r, q, p, g, beta):  # verification of the signature
+    shaObj = SHA3_256.new() 
 
+    data = (str(message)).encode('utf-8')
 
-    shaObj = SHA3_256.new()  # create a SHA3_256 object
-    data = (str(message)).encode('utf-8')  # concatenate the string with v and encode the new string into byte format
-    h = int((shaObj.update(data)).hexdigest(), 16)  # hash the encoded string
+    h = int((shaObj.update(data)).hexdigest(), 16)
+
+    del shaObj
+
+    s = ((alpha * r) - (k * h)) % q 
+
+    return s,r
+
+def SignVer(message, s, r, q, p, g, beta):
+    shaObj = SHA3_256.new()
+    data = (str(message)).encode('utf-8') 
+    h = int((shaObj.update(data)).hexdigest(), 16)
+    
+    del shaObj
 
     v = modinv(h, q)
     z1 = (s * v) % q
+    z1_negative = z1 + p - 1
     z2 = (r * v) % q
-    u = (pow(modinv(g, p), z1, p) * pow(beta, z2, p) % p) % q
 
-    if u == r:
-        print("Signature is accepted.")
-    else:
-        print("Signature is rejected.")
+    u = (pow(g, z1_negative, p) * pow(beta, z2, p)) % q
+
+    return u == r
