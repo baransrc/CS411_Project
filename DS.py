@@ -75,3 +75,7 @@ def GenerateOrRead(fileName, verbose = False):
         print("q: %d \n\np: %d \n\ng: %d" %(q, p, g))
 
     return q, p, g
+
+def random_string(length):
+   letters = string.ascii_lowercase
+   return ''.join(random.choice(letters) for i in range(length))
