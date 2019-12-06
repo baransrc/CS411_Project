@@ -126,7 +126,7 @@ def SignVer(message, s, r, q, p, g, beta):
 
     v = modinv(h, q)
     z1 = (s * v) % q
-    z1_negative = z1 + p - 1
+    z1_negative = p - 1 - z1
     z2 = (r * v) % q
 
     u = (pow(g, z1_negative, p) * pow(beta, z2, p)) % q
