@@ -113,25 +113,19 @@ def SignGen(message, q, p, g, alpha):  # generating signature
     s = ((alpha * h_int) + k) % q  # calculate the s value
     return s,h_int
 
-def SignVer(message, s, h, q, p, g, beta):  # verification of the signature
-    new_h = -h
-    while new_h < 0:
-        new_h += p-1
-    first = pow(g, s, p)
-    second = pow(beta, new_h, p)
-    v = (first * second)% p  # calculate v
-    sha_obj2 = SHA3_256.new()  # create a SHA3_256 object
-    data2 = (str(message) + str(v)).encode('utf-8')  # concatenate the string with v and encode the new string into byte format
-    h_tilde = sha_obj2.update(data2)  # hash the encoded string
-    h_tilde_hex = h_tilde.hexdigest()  # make the hash turn into hex format
-    h_tilde_int = int(h_tilde_hex, 16)  # convert hex to decimal
-    del sha_obj2
-    print(h%q)
-    print(h_tilde_int%q)
-    print(q)
-    if (h%q) == (h_tilde_int % q):  # if h_tilde is equal to h in modulo q, then verification is successful
-        return 0
-        # print("ACCEPT")
-    else:  # for all the other cases, verification is not successful
-        return 1
-        # print("REJECT")
+def SignVer(message, s, r, q, p, g, beta):  # verification of the signature
+
+
+    shaObj = SHA3_256.new()  # create a SHA3_256 object
+    data = (str(message)).encode('utf-8')  # concatenate the string with v and encode the new string into byte format
+    h = int((shaObj.update(data)).hexdigest(), 16)  # hash the encoded string
+
+    v = modinv(h, q)
+    z1 = (s * v) % q
+    z2 = (r * v) % q
+    u = (pow(modinv(g, p), z1, p) * pow(beta, z2, p) % p) % q
+
+    if u == r:
+        print("Signature is accepted.")
+    else:
+        print("Signature is rejected.")
