@@ -5,6 +5,7 @@ import pathlib
 import sys
 import time
 import random
+import string
 from Crypto.Util import number
 
 def Setup(candidate_p_count = 1, verbose = False):
