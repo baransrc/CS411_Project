@@ -101,26 +101,26 @@ elif(ReturnCode < 0): print("Signtature Problem in Tranaction number", -ReturnCo
 elif ReturnCode == 0: print("All Transactions Verify")
 else: print("Unexpected branching")
 
-# Test 2
-# Check PoW of the sample block
-proof = PoW.CheckPow(p, q, g, 5, TxCnt, "block_sample.txt")
-if proof == "" or proof[:5] != "00000":
-    print("PoW is NOT OK:", proof)
-else:
-    print("PoW is OK:", proof)
+# # Test 2
+# # Check PoW of the sample block
+# proof = PoW.CheckPow(p, q, g, 5, TxCnt, "block_sample.txt")
+# if proof == "" or proof[:5] != "00000":
+#     print("PoW is NOT OK:", proof)
+# else:
+#     print("PoW is OK:", proof)
     
-# Test 3
-# This is for generating a PoW for the block in transactions.txt
-# You should have a function called "PoW" in file PoW.py
-PoWLen = 3   # The number of 0 hexadecimal digits; i.e. PoWLen
-block = PoW.PoW(PoWLen, q, p, g, TxCnt, "transactions.txt")
-f = open("block.txt", "w")
-f.write(block)
-f.close()
+# # Test 3
+# # This is for generating a PoW for the block in transactions.txt
+# # You should have a function called "PoW" in file PoW.py
+# PoWLen = 3   # The number of 0 hexadecimal digits; i.e. PoWLen
+# block = PoW.PoW(PoWLen, q, p, g, TxCnt, "transactions.txt")
+# f = open("block.txt", "w")
+# f.write(block)
+# f.close()
 
-# Check PoW
-proof = PoW.CheckPow(p, q, g, PoWLen, TxCnt, "block.txt")
-if proof == "" or proof[:PoWLen] != "0"*PoWLen:
-    print("PoW is NOT OK:", proof)
-else:
-    print("PoW is OK:", proof)
+# # Check PoW
+# proof = PoW.CheckPow(p, q, g, PoWLen, TxCnt, "block.txt")
+# if proof == "" or proof[:PoWLen] != "0"*PoWLen:
+#     print("PoW is NOT OK:", proof)
+# else:
+#     print("PoW is OK:", proof)
