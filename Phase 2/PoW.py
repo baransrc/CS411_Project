@@ -1,6 +1,13 @@
 import math 
 from Crypto.Hash import SHA3_256
 
+def compHash(strTohash):
+    shaObj = SHA3_256.new() 
+    data = strTohash.encode('utf-8')
+    h = int((shaObj.update(data)).hexdigest(), 16)
+    del shaObj
+    return h
+
 def CheckPow(p, q, g, PoWLen, TxCnt, filename):
     file = open(filename, "r")
     lines = file.readlines()
@@ -15,23 +22,17 @@ def CheckPow(p, q, g, PoWLen, TxCnt, filename):
     hashTree = []
     temp = []
     for sign in allSigns:
-        shaObj = SHA3_256.new() 
-        data = (str(sign)).encode('utf-8')
-        h = int((shaObj.update(data)).hexdigest(), 16)
-        del shaObj
+        h = compHash(sign)
         temp.append(h)
     
     hashTree.append(temp)
-    depth = int(math.log(TxCnt,2)) - 1
-    
+    depth = int(math.log(TxCnt,2))
+
     for i in range(0, depth):
         temp = []
         for j in range(0, len(hashTree[i]), 2):
             tempStr = str(hashTree[i][j]) + str(hashTree[i][j + 1])
-            shaObj = SHA3_256.new() 
-            data = tempStr.encode('utf-8')
-            h = int((shaObj.update(data)).hexdigest(), 16)
-            del shaObj
+            h = compHash(tempStr)
             temp.append(h)
         hashTree.append(temp)
     
@@ -40,20 +41,13 @@ def CheckPow(p, q, g, PoWLen, TxCnt, filename):
         nonce = lines[-1][7:-1]
     
     
-    rootNode = hashTree[len(hashTree) - 1][0]
+    rootHash = hashTree[len(hashTree) - 1][0]
+    strReturn = str(rootHash) + nonce
     
-    strReturn = str(rootNode) + str((str(nonce ) + "\n").encode('utf-8'))
-    
-    shaObj = SHA3_256.new() 
-    data = (strReturn).encode('utf-8')
-    h = int((shaObj.update(data)).hexdigest(), 16)
-    del shaObj
+    h = compHash(strReturn)
     
     strReturn = str(h)
     print(strReturn)
     
-    if strReturn[0:5] == "00000":
-        return strReturn
-    else:
-        return ""
+    return strReturn
         
