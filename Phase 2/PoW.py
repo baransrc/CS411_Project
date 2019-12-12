@@ -4,7 +4,7 @@ from Crypto.Hash import SHA3_256
 def compHash(strTohash):
     shaObj = SHA3_256.new() 
     data = strTohash.encode('utf-8')
-    h = int((shaObj.update(data)).hexdigest(), 16)
+    h = (shaObj.update(data)).hexdigest()
     del shaObj
     return h
 
@@ -15,8 +15,12 @@ def CheckPow(p, q, g, PoWLen, TxCnt, filename):
     index = 0
     file.close()
     
-    for curLine in range(5, len(lines), 7):
-        allSigns[index] = lines[curLine][15:]
+    for curLine in range(0, len(lines) - 1, 7):
+        allSigns[index] = lines[curLine + 2][25:].replace('\n', '') 
+        + lines[curLine + 3][25:].replace('\n', '') 
+        + lines[curLine + 5][15:].replace('\n', '') 
+        + lines[curLine + 6][15:].replace('\n', '')
+        print(allSigns[index])
         index += 1
         
     hashTree = []
@@ -38,12 +42,12 @@ def CheckPow(p, q, g, PoWLen, TxCnt, filename):
     
     with open(filename, 'r') as f:
         lines = f.read().splitlines()
-        nonce = lines[-1][7:-1]
-    
+        nonce = lines[-1][7:]
+
     
     rootHash = hashTree[len(hashTree) - 1][0]
     strReturn = str(rootHash) + nonce
-    
+    print("nonce is: ", nonce)
     h = compHash(strReturn)
     
     strReturn = str(h)
