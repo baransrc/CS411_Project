@@ -93,21 +93,21 @@ else:
 TxCnt = 64
 Tx.gen_random_txblock(q, p, g, TxCnt, "transactions.txt")
 
-# Test 1
-# Check all your transactions in a block
-ReturnCode = CheckBlock(q, p, g, TxCnt, "transactions.txt")
-if ReturnCode == -10000: print("File Problem")
-elif(ReturnCode < 0): print("Signtature Problem in Tranaction number", -ReturnCode)
-elif ReturnCode == 0: print("All Transactions Verify")
-else: print("Unexpected branching")
+## Test 1
+## Check all your transactions in a block
+#ReturnCode = CheckBlock(q, p, g, TxCnt, "transactions.txt")
+#if ReturnCode == -10000: print("File Problem")
+#elif(ReturnCode < 0): print("Signtature Problem in Tranaction number", -ReturnCode)
+#elif ReturnCode == 0: print("All Transactions Verify")
+#else: print("Unexpected branching")
 
-# # Test 2
-# # Check PoW of the sample block
-# proof = PoW.CheckPow(p, q, g, 5, TxCnt, "block_sample.txt")
-# if proof == "" or proof[:5] != "00000":
-#     print("PoW is NOT OK:", proof)
-# else:
-#     print("PoW is OK:", proof)
+ # Test 2
+ # Check PoW of the sample block
+proof = PoW.CheckPow(p, q, g, 5, TxCnt, "block_sample.txt")
+if proof == "" or proof[:5] != "00000":
+    print("PoW is NOT OK:", proof)
+else:
+    print("PoW is OK:", proof)
     
 # # Test 3
 # # This is for generating a PoW for the block in transactions.txt
