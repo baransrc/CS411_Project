@@ -93,13 +93,13 @@ else:
 TxCnt = 64
 Tx.gen_random_txblock(q, p, g, TxCnt, "transactions.txt")
 
-## Test 1
-## Check all your transactions in a block
-#ReturnCode = CheckBlock(q, p, g, TxCnt, "transactions.txt")
-#if ReturnCode == -10000: print("File Problem")
-#elif(ReturnCode < 0): print("Signtature Problem in Tranaction number", -ReturnCode)
-#elif ReturnCode == 0: print("All Transactions Verify")
-#else: print("Unexpected branching")
+# Test 1
+# Check all your transactions in a block
+ReturnCode = CheckBlock(q, p, g, TxCnt, "transactions.txt")
+if ReturnCode == -10000: print("File Problem")
+elif(ReturnCode < 0): print("Signtature Problem in Tranaction number", -ReturnCode)
+elif ReturnCode == 0: print("All Transactions Verify")
+else: print("Unexpected branching")
 
  # Test 2
  # Check PoW of the sample block
@@ -109,18 +109,18 @@ if proof == "" or proof[:5] != "00000":
 else:
     print("PoW is OK:", proof)
     
-# # Test 3
-# # This is for generating a PoW for the block in transactions.txt
-# # You should have a function called "PoW" in file PoW.py
-# PoWLen = 3   # The number of 0 hexadecimal digits; i.e. PoWLen
-# block = PoW.PoW(PoWLen, q, p, g, TxCnt, "transactions.txt")
-# f = open("block.txt", "w")
-# f.write(block)
-# f.close()
+# Test 3
+# This is for generating a PoW for the block in transactions.txt
+# You should have a function called "PoW" in file PoW.py
+PoWLen = 5   # The number of 0 hexadecimal digits; i.e. PoWLen
+block = PoW.PoW(PoWLen, q, p, g, TxCnt, "transactions.txt")
+f = open("block.txt", "w")
+f.write(block)
+f.close()
 
-# # Check PoW
-# proof = PoW.CheckPow(p, q, g, PoWLen, TxCnt, "block.txt")
-# if proof == "" or proof[:PoWLen] != "0"*PoWLen:
-#     print("PoW is NOT OK:", proof)
-# else:
-#     print("PoW is OK:", proof)
+# Check PoW
+proof = PoW.CheckPow(p, q, g, PoWLen, TxCnt, "block.txt")
+if proof == "" or proof[:PoWLen] != "0"*PoWLen:
+    print("PoW is NOT OK:", proof)
+else:
+    print("PoW is OK:", proof)
