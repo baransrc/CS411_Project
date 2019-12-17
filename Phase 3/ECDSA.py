@@ -19,9 +19,8 @@ def modinv(a, m):
     else:
         return x % m
 
-def KeyGen(E):
-    # print("KeyGen")
 
+def KeyGen(E):
     order = E.order
 
     generator = E.generator
@@ -36,53 +35,50 @@ def KeyGen(E):
 
 
 def SignGen(message, E, sA):
-    # print("SignGen")
+    n = E.order
 
-    order = E.order
+    G = E.generator
 
-    generator = E.generator
-
-    hashedMessage = int(SHA3_256.new(message).hexdigest(), 16)
+    h = int(SHA3_256.new(message).hexdigest(), 16)
 
     r = 0
     s = 0
 
     while r == 0 or s == 0:
-        k = random.randint(2, order - 1)
+        k = random.randint(1, n - 1)
 
-        randomPoint = k * generator
+        R = k * G
 
-        r = randomPoint.x
+        r = R.x % n
 
-        k_inv = modinv(k, order)
+        k_inv = modinv(k, n)
 
-        s = (k_inv * (hashedMessage + (r * sA))) % order
+        s = (k_inv * (h + (sA * r))) % n
 
     return s, r
 
 def SignVer(message, s, r, E, QA):
-    # print("SignVer")
+    n = E.order
 
-    order = E.order
+    G = E.generator
 
-    generator = E.generator
+    h = int(SHA3_256.new(message).hexdigest(), 16) 
+    # I also tried: h = int.from_bytes(SHA3_256.new(message).digest(), "big")
+    # And           h = int.from_bytes(SHA3_256.new(message).digest(), "little")
 
-    hashedMessage = int(SHA3_256.new(message).hexdigest(), 16)
+    s_inv = modinv(s, n)
 
-    print(hashedMessage)
+    u1 = (h * s_inv) % n
+    u2 = (r * s_inv) % n
 
-    s_inv = modinv(s, order)
+    R = (u1 * G) + (u2 * QA) 
 
-    u1 = (hashedMessage * s_inv) % order
-    u2 = (r * s_inv) % order
+    # print("R X: %d \nR Y: %d" % (R.x, R.y))
 
-    randomPoint = (u1 * generator) + (u2 * QA) 
+    v = R.x % n
 
-    # print("Random Point X: %d \nRandom Point Y: %d" % (randomPoint.x, randomPoint.y))
+    r = r % n
 
-    acquired_r = randomPoint.x % order
+    print("r: %d \nv: %d" % (r, v))
 
-    print(acquired_r)
-    print(r)
-
-    return 0 if (acquired_r == r) else 1
+    return 0 if (v == r) else 1
