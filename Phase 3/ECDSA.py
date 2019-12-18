@@ -1,84 +1,117 @@
 import random
 import sys
-from ecpy.curves import Curve
+from ecpy.curves import Curve, Point
 from Crypto.Hash import SHA3_256
+import secrets
 
-def egcd(a, b):
-    x,y, u,v = 0,1, 1,0
-    while a != 0:
-        q, r = b//a, b%a
-        m, n = x-u*q, y-v*q
-        b,a, x,y, u,v = a,r, u,v, m,n
-    gcd = b
-    return gcd, x, y
+def ModularInversePrime(k, p):
+    return pow(k, p - 2, p)
 
-def modinv(a, m):
-    gcd, x, y = egcd(a, m)
-    if gcd != 1:
-        return None  # modular inverse does not exist
+def EllipticSum(Px, Py, Qx, Qy, E):
+    a = E.a
+    b = E.b
+    p = E.field
+
+    Lambda = 0
+
+    Px = Px % p
+    Py = Py % p
+    Qx = Qx % p
+    Qy = Qy % p
+
+    if Px == Qx and Py == Qy:
+        Lambda = (((3 * ((Px)**2)) + a) * ModularInversePrime(2 * Py, p)) % p
     else:
-        return x % m
+        Lambda = ((Py - Qy) * ModularInversePrime(Px - Qx, p)) % p
 
+    x = ((Lambda**2) - Px - Qx) % p
+    y = ((Lambda * (Px - x)) -Py) % p
+
+    return x, y
+
+def EllipticMultiplication(Px, Py, k, E):
+    Tx = Px
+    Ty = Py
+    Qx = 0
+    Qy = 0
+    
+    firstTime = True
+
+    while k != 0:
+        if (k % 2) != 0:
+            if firstTime == True:
+                Qx = Tx
+                Qy = Ty
+                firstTime = False
+            else:
+                Qx, Qy = EllipticSum(Qx, Qy, Tx, Ty, E)
+        
+        k = k // 2
+
+        if k != 0:
+            Tx, Ty = EllipticSum(Tx, Ty, Tx, Ty, E)
+    
+    return Qx, Qy        
 
 def KeyGen(E):
-    order = E.order
+    n = E.order
+    P = E.generator
 
-    generator = E.generator
+    sA = secrets.randbelow(n-1)
+    x, y = EllipticMultiplication(P.x, P.y, sA, E)
 
-    privateKey = random.randint(2, order - 1)
+    QA = Point(x, y, E)
 
-    publicKey = generator * privateKey
+    # print("Private Key: %d \nPublic Key X: %d \nPublic Key Y: %d" % (sA, QA.x, QA.y))
 
-    # print("Private Key: %d \nPublic Key X: %d \nPublic Key Y: %d" % (privateKey, publicKey.x, publicKey.y))
+    return sA, QA
 
-    return privateKey, publicKey
-
+def Hash(msg):
+    hashBytes = SHA3_256.new(msg).digest()
+    return int.from_bytes(hashBytes, byteorder="big")
 
 def SignGen(message, E, sA):
     n = E.order
 
-    G = E.generator
+    P = E.generator
 
-    h = int(SHA3_256.new(message).hexdigest(), 16)
+    h = Hash(message) % n
 
     r = 0
     s = 0
 
     while r == 0 or s == 0:
-        k = random.randint(1, n - 1)
+        k = secrets.randbelow(n)
 
-        R = k * G
+        Rx, Ry = EllipticMultiplication(P.x, P.y, k, E)
 
-        r = R.x % n
+        r = (Rx) % n
 
-        k_inv = modinv(k, n)
+        k_inv = ModularInversePrime(k, n)
 
-        s = (k_inv * (h + (sA * r))) % n
+        s = ((k_inv * (h + (sA * r))) % n)
 
     return s, r
 
-def SignVer(message, s, r, E, QA):
+def SignVer(message, s, r, E, QA): 
     n = E.order
+    P = E.generator
+    h = Hash(message) % n
 
-    G = E.generator
-
-    h = int(SHA3_256.new(message).hexdigest(), 16) 
-    # I also tried: h = int.from_bytes(SHA3_256.new(message).digest(), "big")
-    # And           h = int.from_bytes(SHA3_256.new(message).digest(), "little")
-
-    s_inv = modinv(s, n)
+    s_inv = ModularInversePrime(s, n)
 
     u1 = (h * s_inv) % n
     u2 = (r * s_inv) % n
 
-    R = (u1 * G) + (u2 * QA) 
+    u1P_x, u1P_y = EllipticMultiplication(P.x, P.y, u1, E)
+    u2QA_x, u2QA_y = EllipticMultiplication(QA.x, QA.y, u2, E)
 
-    # print("R X: %d \nR Y: %d" % (R.x, R.y))
+    Rx, Ry = EllipticSum(u1P_x, u1P_y, u2QA_x, u2QA_y, E)
 
-    v = R.x % n
+    v = (Rx) % n
 
     r = r % n
 
-    print("r: %d \nv: %d" % (r, v))
+    print("v: %d \nr: %d" % (v, r))
 
     return 0 if (v == r) else 1
