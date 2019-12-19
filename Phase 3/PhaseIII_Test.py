@@ -130,21 +130,21 @@ r = 1157465592553644381910536171801389697797144284334546130984111011749356262571
 if ECDSA.SignVer(message, s, r, E, QA)== 0: print("Test II: The signature verifies")
 else: print("Test II: The signature DOES NOT verify")
 
-# # Test III
-# #########
-# # Generating random transactions signed by ECDSA
-# TxCnt = 32 # the number of transactions in the block
-# tx_blk = gen_random_txblock(E, TxCnt)   
-# fp = open("transactions.txt", "w")
-# fp.write(tx_blk)
-# fp.close()
+# Test III
+#########
+# Generating random transactions signed by ECDSA
+TxCnt = 32 # the number of transactions in the block
+tx_blk = gen_random_txblock(E, TxCnt)   
+fp = open("transactions.txt", "w")
+fp.write(tx_blk)
+fp.close()
 
-# # Verify the signatures of all your transactions in a block
-# ReturnCode = CheckTransactions("transactions.txt", E)
-# if ReturnCode == -10000: print("Test III: File Problem")
-# elif(ReturnCode < 0): print("Test III: Signature Problem in Transaction number", -ReturnCode)
-# elif ReturnCode == 0: print("Test III: All transactions verify")
-# else: print("Test III: Unexpected branching")
+# Verify the signatures of all your transactions in a block
+ReturnCode = CheckTransactions("transactions.txt", E)
+if ReturnCode == -10000: print("Test III: File Problem")
+elif(ReturnCode < 0): print("Test III: Signature Problem in Transaction number", -ReturnCode)
+elif ReturnCode == 0: print("Test III: All transactions verify")
+else: print("Test III: Unexpected branching")
 
 
 # # Test IV

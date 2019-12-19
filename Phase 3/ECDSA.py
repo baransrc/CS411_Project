@@ -87,9 +87,7 @@ def SignGen(message, E, sA):
 
         r = (Rx) % n
 
-        k_inv = ModularInversePrime(k, n)
-
-        s = ((k_inv * (h + (sA * r))) % n)
+        s = ((sA * r) - (k * h)) % n
 
     return s, r
 
@@ -98,12 +96,12 @@ def SignVer(message, s, r, E, QA):
     P = E.generator
     h = Hash(message) % n
 
-    s_inv = ModularInversePrime(s, n)
+    h_inv = ModularInversePrime(h, n)
 
-    u1 = (h * s_inv) % n
-    u2 = (r * s_inv) % n
+    u1 = (s * h_inv) % n
+    u2 = (r * h_inv) % n
 
-    u1P_x, u1P_y = EllipticMultiplication(P.x, P.y, u1, E)
+    u1P_x, u1P_y = EllipticMultiplication(P.x, P.y, n - u1, E)
     u2QA_x, u2QA_y = EllipticMultiplication(QA.x, QA.y, u2, E)
 
     Rx, Ry = EllipticSum(u1P_x, u1P_y, u2QA_x, u2QA_y, E)
@@ -112,6 +110,6 @@ def SignVer(message, s, r, E, QA):
 
     r = r % n
 
-    print("v: %d \nr: %d" % (v, r))
+    # print("v: %d \nr: %d" % (v, r))
 
     return 0 if (v == r) else 1
