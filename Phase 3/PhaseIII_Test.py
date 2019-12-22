@@ -106,45 +106,45 @@ def CheckBlock(TxCnt, Block):
 # Student Part
 E = Curve.get_curve('secp256k1') # We will always use this curve
 
-# # Test I
-# #########
-# # Testing our version of ECDSA;
-# # Generate a signature and verify it
-# sA, QA = ECDSA.KeyGen(E)   # generate a secret/public key pair
+# Test I
+#########
+# Testing our version of ECDSA;
+# Generate a signature and verify it
+sA, QA = ECDSA.KeyGen(E)   # generate a secret/public key pair
 
-# message = b"When you can't find the sunshine, be the sunshine"
-# s, r = ECDSA.SignGen(message, E, sA)
-# if ECDSA.SignVer(message, s, r, E, QA)== 0: print("Test I: The signature verifies")
-# else: print("Test I: The signature DOES NOT verify")
+message = b"When you can't find the sunshine, be the sunshine"
+s, r = ECDSA.SignGen(message, E, sA)
+if ECDSA.SignVer(message, s, r, E, QA)== 0: print("Test I: The signature verifies")
+else: print("Test I: The signature DOES NOT verify")
 
-# # Test II
-# #########
-# # Testing our version of ECDSA against instructor's implementation
-# # Verify given and signature and a public key
-# message = b"The grass is greener where you water it"
-# QA = Point(0x7ab5dec56a20e34df53271ca762783f676220a2ea070232f826f3039406b5d7a,
-#            0x36f65e364f7256b351d3d8104afdfeb8db9c1a04d4e2c5b3a8d2641cf0621ed6,
-#         E)
-# s = 4289659650376074400726941554044308237614114989665261590076669828835550338890
-# r = 115746559255364438191053617180138969779714428433454613098411101174935626257180
-# if ECDSA.SignVer(message, s, r, E, QA)== 0: print("Test II: The signature verifies")
-# else: print("Test II: The signature DOES NOT verify")
+# Test II
+#########
+# Testing our version of ECDSA against instructor's implementation
+# Verify given and signature and a public key
+message = b"The grass is greener where you water it"
+QA = Point(0x7ab5dec56a20e34df53271ca762783f676220a2ea070232f826f3039406b5d7a,
+           0x36f65e364f7256b351d3d8104afdfeb8db9c1a04d4e2c5b3a8d2641cf0621ed6,
+        E)
+s = 4289659650376074400726941554044308237614114989665261590076669828835550338890
+r = 115746559255364438191053617180138969779714428433454613098411101174935626257180
+if ECDSA.SignVer(message, s, r, E, QA)== 0: print("Test II: The signature verifies")
+else: print("Test II: The signature DOES NOT verify")
 
-# # Test III
-# #########
-# # Generating random transactions signed by ECDSA
-# TxCnt = 32 # the number of transactions in the block
-# tx_blk = gen_random_txblock(E, TxCnt)   
-# fp = open("transactions.txt", "w")
-# fp.write(tx_blk)
-# fp.close()
+# Test III
+#########
+# Generating random transactions signed by ECDSA
+TxCnt = 32 # the number of transactions in the block
+tx_blk = gen_random_txblock(E, TxCnt)   
+fp = open("transactions.txt", "w")
+fp.write(tx_blk)
+fp.close()
 
-# # Verify the signatures of all your transactions in a block
-# ReturnCode = CheckTransactions("transactions.txt", E)
-# if ReturnCode == -10000: print("Test III: File Problem")
-# elif(ReturnCode < 0): print("Test III: Signature Problem in Transaction number", -ReturnCode)
-# elif ReturnCode == 0: print("Test III: All transactions verify")
-# else: print("Test III: Unexpected branching")
+# Verify the signatures of all your transactions in a block
+ReturnCode = CheckTransactions("transactions.txt", E)
+if ReturnCode == -10000: print("Test III: File Problem")
+elif(ReturnCode < 0): print("Test III: Signature Problem in Transaction number", -ReturnCode)
+elif ReturnCode == 0: print("Test III: All transactions verify")
+else: print("Test III: Unexpected branching")
 
 
 # Test IV
