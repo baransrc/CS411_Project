@@ -11,7 +11,6 @@ def AddBlock2Chain(PoWLen, TxCnt, block_candidate, PrevBlock):
         Prev_PrevPow = (str(PrevBlock[len(PrevBlock) - 2])[14:-1]).encode("UTF-8")
         PrevNonceInt = int(str(PrevBlock[len(PrevBlock) - 1])[7:-1])
         PrevNonce = PrevNonceInt.to_bytes((PrevNonceInt.bit_length()+7)//8, byteorder = 'big')
-
         PrevPow = HashHexDigest(prevRootHash + Prev_PrevPow + PrevNonce)
     
     Pow, Nonce = FindPoWAndNonce(rootHash, PrevPow.encode("UTF-8"), PoWLen)
@@ -33,7 +32,8 @@ def FindPoWAndNonce(rootHash, PrevPow, PoWLen):
     nonce = 0
     PoW = ""
 
-    for currentNonce in range(2**64, 0, -1):
+    while True:
+        currentNonce = secrets.randbelow(2**128)
         concatenated = rootHash + PrevPow + currentNonce.to_bytes((currentNonce.bit_length()+7)//8, byteorder="big")
         proofOfWorkStr = HashHexDigest(concatenated)
         if (proofOfWorkStr[:PoWLen] == "0" * PoWLen):
